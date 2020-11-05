@@ -30,25 +30,21 @@ test01AddingCustomerShouldNotTakeMoreThan50Milliseconds
 
 	self assert: (self duracionDeLaAccion: [customerBook addCustomerNamed: 'John Lennon']) < (50 * millisecond)! !
 
-!CustomerBookTest methodsFor: 'tests' stamp: 'NR 4/3/2019 10:50:13'!
+!CustomerBookTest methodsFor: 'tests' stamp: 'AF 11/5/2020 16:20:02'!
 test02RemovingCustomerShouldNotTakeMoreThan100Milliseconds
 
-	| customerBook millisecondsBeforeRunning millisecondsAfterRunning paulMcCartney |
+	| customerBook paulMcCartney |
 	
 	customerBook := CustomerBook new.
 	paulMcCartney := 'Paul McCartney'.
 	
 	customerBook addCustomerNamed: paulMcCartney.
-	  
-	millisecondsBeforeRunning := Time millisecondClockValue * millisecond.
-	customerBook removeCustomerNamed: paulMcCartney.
-	millisecondsAfterRunning := Time millisecondClockValue * millisecond.
-	
-	self assert: (millisecondsAfterRunning-millisecondsBeforeRunning) < (100 * millisecond)
+	  	
+	self assert: (self duracionDeLaAccion: [customerBook removeCustomerNamed: paulMcCartney]) < (100 * millisecond)
 	
 ! !
 
-!CustomerBookTest methodsFor: 'tests' stamp: 'HernanWilkinson 5/9/2012 18:12'!
+!CustomerBookTest methodsFor: 'tests' stamp: 'AF 11/5/2020 18:39:38'!
 test03CanNotAddACustomerWithEmptyName 
 
 	| customerBook |
@@ -79,67 +75,119 @@ test04CanNotRemoveAnInvalidCustomer
 			self assert: (customerBook includesCustomerNamed: johnLennon) ]
 ! !
 
-!CustomerBookTest methodsFor: 'tests' stamp: 'NR 4/3/2019 10:50:25'!
+!CustomerBookTest methodsFor: 'tests' stamp: 'AF 11/5/2020 17:45:39'!
 test05SuspendingACustomerShouldNotRemoveItFromCustomerBook
 
-	| customerBook paulMcCartney|
-	
-	customerBook := CustomerBook new.
-	paulMcCartney := 'Paul McCartney'.
-	
-	customerBook addCustomerNamed: paulMcCartney.
-	customerBook suspendCustomerNamed: paulMcCartney.
-	
-	self assert: 0 equals: customerBook numberOfActiveCustomers.
-	self assert: 1 equals: customerBook numberOfSuspendedCustomers.
-	self assert: 1 equals: customerBook numberOfCustomers.
-	self assert: (customerBook includesCustomerNamed: paulMcCartney).
+	self removerClienteSuspendido: false.
 	
 
 	
 ! !
 
-!CustomerBookTest methodsFor: 'tests' stamp: 'NR 4/3/2019 10:50:28'!
+!CustomerBookTest methodsFor: 'tests' stamp: 'AF 11/5/2020 17:45:58'!
 test06RemovingASuspendedCustomerShouldRemoveItFromCustomerBook
 
-	| customerBook paulMcCartney|
-	
-	customerBook := CustomerBook new.
-	paulMcCartney := 'Paul McCartney'.
-	
-	customerBook addCustomerNamed: paulMcCartney.
-	customerBook suspendCustomerNamed: paulMcCartney.
-	customerBook removeCustomerNamed: paulMcCartney.
-	
-	self assert: 0 equals: customerBook numberOfActiveCustomers.
-	self assert: 0 equals: customerBook numberOfSuspendedCustomers.
-	self assert: 0 equals: customerBook numberOfCustomers.
-	self deny: (customerBook includesCustomerNamed: paulMcCartney).
-
+	self removerClienteSuspendido: true.
 
 	
 ! !
 
-!CustomerBookTest methodsFor: 'tests' stamp: 'NR 4/30/2020 09:08:46'!
+!CustomerBookTest methodsFor: 'tests' stamp: 'AF 11/5/2020 18:32:05'!
 test07CanNotSuspendAnInvalidCustomer
-	
+
 	| customerBook johnLennon |
 			
 	customerBook := CustomerBook new.
 	johnLennon := 'John Lennon'.
 	customerBook addCustomerNamed: johnLennon.
 	
+	self noSePuedeSuspenderA: 'Ringo Starr' libro: customerBook .
+
+	"
 	[ customerBook suspendCustomerNamed: 'Ringo Starr'.
 	self fail ]
 		on: CantSuspend 
 		do: [ :anError | 
 			self assert: customerBook numberOfCustomers = 1.
-			self assert: (customerBook includesCustomerNamed: johnLennon) ]
+			self assert: (customerBook includesCustomerNamed: johnLennon) ]"
 ! !
 
-!CustomerBookTest methodsFor: 'tests' stamp: 'NR 9/19/2018 17:57:11'!
+!CustomerBookTest methodsFor: 'tests' stamp: 'AF 11/5/2020 18:31:52'!
 test08CanNotSuspendAnAlreadySuspendedCustomer
 	
+	| customerBook johnLennon |
+			
+	customerBook := CustomerBook new.
+	johnLennon := 'John Lennon'.
+
+	customerBook addCustomerNamed: johnLennon.
+	customerBook suspendCustomerNamed: johnLennon.
+	
+	self noSePuedeSuspenderA: 'John Lennon' libro: customerBook .
+
+	
+	"
+	[ customerBook suspendCustomerNamed: johnLennon.
+	self fail ]
+		on: CantSuspend 
+		do: [ :anError | 
+			self assert: customerBook numberOfCustomers = 1.
+			self assert: (customerBook includesCustomerNamed: johnLennon) ]"
+! !
+
+
+!CustomerBookTest methodsFor: 'as yet unclassified' stamp: 'AF 11/5/2020 16:14:16'!
+duracionDeLaAccion: unaAccion
+
+	| millisecondsBeforeRunning millisecondsAfterRunning |
+	
+
+	millisecondsBeforeRunning := Time millisecondClockValue * millisecond.
+	unaAccion value.
+	millisecondsAfterRunning := Time millisecondClockValue * millisecond.
+	
+	^(millisecondsAfterRunning-millisecondsBeforeRunning).
+	
+! !
+
+!CustomerBookTest methodsFor: 'as yet unclassified' stamp: 'AF 11/5/2020 16:44:57'!
+noSePuedeRealizarAccion: unaAccion enCasoDe: caso hacer: otraAccion
+
+	[unaAccion value.
+	self fail ]
+		on: caso 
+		do: otraAccion! !
+
+!CustomerBookTest methodsFor: 'as yet unclassified' stamp: 'AF 11/5/2020 18:22:43'!
+noSePuedeSuspenderA: unCliente
+
+	| customerBook johnLennon |
+			
+	customerBook := CustomerBook new.
+	johnLennon := 'John Lennon'.
+	customerBook addCustomerNamed: johnLennon.
+	customerBook suspendCustomerNamed: johnLennon.
+	
+	[ customerBook suspendCustomerNamed: unCliente.
+	self fail ]
+		on: CantSuspend 
+		do: [ :anError | 
+			self assert: customerBook numberOfCustomers = 1.
+			self assert: (customerBook includesCustomerNamed: johnLennon) ]! !
+
+!CustomerBookTest methodsFor: 'as yet unclassified' stamp: 'AF 11/5/2020 18:31:35'!
+noSePuedeSuspenderA: unCliente libro: unLibro
+	
+	[ unLibro suspendCustomerNamed: unCliente.
+	self fail ]
+		on: CantSuspend 
+		do: [ :anError | 
+			self assert: unLibro numberOfCustomers = 1.
+			self assert: (unLibro includesCustomerNamed: 'John Lennon') ]! !
+
+!CustomerBookTest methodsFor: 'as yet unclassified' stamp: 'AF 11/5/2020 17:54:00'!
+noSePuedeSuspenderSi: unaAccion
+
 	| customerBook johnLennon |
 			
 	customerBook := CustomerBook new.
@@ -152,52 +200,60 @@ test08CanNotSuspendAnAlreadySuspendedCustomer
 		on: CantSuspend 
 		do: [ :anError | 
 			self assert: customerBook numberOfCustomers = 1.
-			self assert: (customerBook includesCustomerNamed: johnLennon) ]
-! !
+			self assert: (customerBook includesCustomerNamed: johnLennon) ]! !
+
+!CustomerBookTest methodsFor: 'as yet unclassified' stamp: 'AF 11/5/2020 17:44:33'!
+removerClienteSuspendido: debeEstarRemovido
 
 
-!CustomerBookTest methodsFor: 'as yet unclassified' stamp: 'AH 11/2/2020 21:36:13'!
-accionTardaMasQue: tiempo unaAccion: accion
-
-	| millisecondsBeforeRunning millisecondsAfterRunning |
-	
-
-	millisecondsBeforeRunning := Time millisecondClockValue * millisecond.
-	accion.
-	millisecondsAfterRunning := Time millisecondClockValue * millisecond.
-	
-	self assert: (millisecondsAfterRunning-millisecondsBeforeRunning) < (tiempo * millisecond)
-	
-! !
-
-!CustomerBookTest methodsFor: 'as yet unclassified' stamp: 'AH 11/2/2020 21:04:54'!
-agregarTardaMasQue: tiempo
-
-	| customerBook millisecondsBeforeRunning millisecondsAfterRunning |
+	| customerBook paulMcCartney numeroDeSuspendidosEsperados numeroTotal numeroDeActivosEsperados |.
 	
 	customerBook := CustomerBook new.
+	paulMcCartney := 'Paul McCartney'.
 	
-	millisecondsBeforeRunning := Time millisecondClockValue * millisecond.
-	customerBook addCustomerNamed: 'John Lennon'.
-	millisecondsAfterRunning := Time millisecondClockValue * millisecond.
 	
-	self assert: (millisecondsAfterRunning-millisecondsBeforeRunning) < (tiempo * millisecond)
 	
-! !
+	customerBook addCustomerNamed: paulMcCartney.
+	customerBook suspendCustomerNamed: paulMcCartney.
+	debeEstarRemovido ifTrue: [customerBook removeCustomerNamed: paulMcCartney.] .
+	
+	numeroDeActivosEsperados := 0.
+	numeroDeSuspendidosEsperados := [debeEstarRemovido ifTrue: 0 ifFalse: 1.] value.
+	numeroTotal := [debeEstarRemovido ifTrue: 0 ifFalse: 1.] value.
+	
+	self assert: numeroDeActivosEsperados equals: customerBook numberOfActiveCustomers.
+	self assert: numeroDeSuspendidosEsperados equals: customerBook numberOfSuspendedCustomers.
+	self assert: numeroTotal equals: customerBook numberOfCustomers.
+	self assert: (debeEstarRemovido = (customerBook includesCustomerNamed: paulMcCartney) not).! !
 
-!CustomerBookTest methodsFor: 'as yet unclassified' stamp: 'AH 11/2/2020 21:52:55'!
-duracionDeLaAccion: unaAccion
+!CustomerBookTest methodsFor: 'as yet unclassified' stamp: 'AF 11/5/2020 17:06:29'!
+setearClientes: unCaso  activos: cantidadDeActivos suspendidos: cantidadDeSuspendidos total: cantidadTotal
 
-	| millisecondsBeforeRunning millisecondsAfterRunning |
 	
+	
+	| customerBook paulMcCartney|
+	
+	customerBook := CustomerBook new.
+	paulMcCartney := 'Paul McCartney'.
+	
+	
+	unCaso value.
+	
+	self assert: 0 equals: customerBook numberOfActiveCustomers.
+	self assert: 0 equals: customerBook numberOfSuspendedCustomers.
+	self assert: 0 equals: customerBook numberOfCustomers.
+	self deny: (customerBook includesCustomerNamed: paulMcCartney).! !
 
-	millisecondsBeforeRunning := Time millisecondClockValue * millisecond.
-	unaAccion value.
-	millisecondsAfterRunning := Time millisecondClockValue * millisecond.
+!CustomerBookTest methodsFor: 'as yet unclassified' stamp: 'AF 11/5/2020 17:15:37'!
+setearClientes: unCaso  activos: cantidadDeActivos suspendidos: cantidadDeSuspendidos total: cantidadTotal libro: unLibro
+
+
+	unCaso value.
 	
-	^(millisecondsAfterRunning-millisecondsBeforeRunning)*millisecond.
-	
-! !
+	self assert: cantidadDeActivos equals: unLibro numberOfActiveCustomers.
+	self assert: cantidadDeSuspendidos equals: unLibro numberOfSuspendedCustomers.
+	self assert: cantidadTotal equals: unLibro numberOfCustomers.
+	! !
 
 
 !classDefinition: #CustomerBook category: 'CodigoRepetido-Ejercicio'!
