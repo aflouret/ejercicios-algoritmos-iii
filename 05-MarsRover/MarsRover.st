@@ -5,393 +5,216 @@ TestCase subclass: #MarsRoverTest
 	poolDictionaries: ''
 	category: 'MarsRover'!
 
-!MarsRoverTest methodsFor: 'as yet unclassified' stamp: 'AH 12/6/2020 16:21:10'!
-test01EmptyCommandShouldNotMoveRover
+!MarsRoverTest methodsFor: 'as yet unclassified' stamp: 'AF 12/6/2020 18:33:03'!
+test01EmptyCommandShouldNotMoveNorRotateRover
 
 	| marsRover |
-	marsRover := MarsRover inPosition: 0@0 inDirection: #NorthCompass.
+	marsRover := MarsRover atPosition: 0@0 facingDirection: #North.
 	
 	marsRover receiveSequenceOfCommands: ''.
 	
-	self assert: (marsRover position: 0@0 facingTo: #NorthCompass)
+	self assert: (marsRover isAtPosition: 0@0 facingDirection: #North)
 	! !
 
-!MarsRoverTest methodsFor: 'as yet unclassified' stamp: 'AH 12/6/2020 16:21:09'!
-test18
+!MarsRoverTest methodsFor: 'as yet unclassified' stamp: 'AF 12/6/2020 18:33:03'!
+test18MarsRoverShouldBeAbleToExecuteMultipleCommands
 
 	| marsRover |
-	marsRover := MarsRover inPosition: 0@0 inDirection: #NorthCompass.
+	marsRover := MarsRover atPosition: 0@0 facingDirection: #North.
+	
+	marsRover receiveSequenceOfCommands: 'ffrrlb'.
+	
+	self assert: (marsRover isAtPosition: -1@2 facingDirection: #East)
+	! !
+
+!MarsRoverTest methodsFor: 'as yet unclassified' stamp: 'AF 12/6/2020 18:33:03'!
+test19InvalidCommandShouldStopCommandProcessing
+
+	| marsRover |
+	marsRover := MarsRover atPosition: 0@0 facingDirection: #North.
 	
 	marsRover receiveSequenceOfCommands: 'fff*ff'.
 	
-	self assert: (marsRover position: 0@3 facingTo: #NorthCompass)
+	self assert: (marsRover isAtPosition: 0@3 facingDirection: #North)
 	! !
 
 
-!MarsRoverTest methodsFor: 'testRotation' stamp: 'AH 12/6/2020 16:21:29'!
-test02rotatesFromNorthToWest
+!MarsRoverTest methodsFor: 'testRotation' stamp: 'AF 12/6/2020 18:33:03'!
+test04RotateLeftCommandShouldRotateRoverFromNorthToWest
 
 	| marsRover |
-	marsRover := MarsRover inPosition: 0@0 inDirection: #NorthCompass.
+	marsRover := MarsRover atPosition: 0@0 facingDirection: #North.
 	
 	marsRover receiveSequenceOfCommands: 'l'.
 	
-	self assert: (marsRover position: 0@0 facingTo: #WestCompass)
+	self assert: (marsRover isAtPosition: 0@0 facingDirection: #West)
 	! !
 
-!MarsRoverTest methodsFor: 'testRotation' stamp: 'AH 12/6/2020 16:21:10'!
-test03NorteRotarDerecha
+!MarsRoverTest methodsFor: 'testRotation' stamp: 'AF 12/6/2020 18:33:03'!
+test05RotateRightCommandShouldRotateRoverFromNorthToEast
 
 	| marsRover |
-	marsRover := MarsRover inPosition: 0@0 inDirection: #NorthCompass.
+	marsRover := MarsRover atPosition: 0@0 facingDirection: #North.
 	
 	marsRover receiveSequenceOfCommands: 'r'.
 	
-	self assert: (marsRover position: 0@0 facingTo: #EastCompass)
+	self assert: (marsRover isAtPosition: 0@0 facingDirection: #East)
 	! !
 
-!MarsRoverTest methodsFor: 'testRotation' stamp: 'AH 12/6/2020 16:21:20'!
-test04
+!MarsRoverTest methodsFor: 'testRotation' stamp: 'AF 12/6/2020 18:33:03'!
+test08RotateLeftCommandShouldRotateRoverFromEastToNorth
 
 	| marsRover |
-	marsRover := MarsRover inPosition: 0@0 inDirection: #SouthCompass.
+	marsRover := MarsRover atPosition: 0@0 facingDirection: #East.
 	
 	marsRover receiveSequenceOfCommands: 'l'.
 	
-	self assert: (marsRover position: 0@0 facingTo: #EastCompass)
+	self assert: (marsRover isAtPosition: 0@0 facingDirection: #North)
 	! !
 
-!MarsRoverTest methodsFor: 'testRotation' stamp: 'AH 12/6/2020 16:21:29'!
-test05
+!MarsRoverTest methodsFor: 'testRotation' stamp: 'AF 12/6/2020 18:33:03'!
+test09RotateRightCommandShouldRotateRoverFromEastToSouth
 
 	| marsRover |
-	marsRover := MarsRover inPosition: 0@0 inDirection: #SouthCompass.
+	marsRover := MarsRover atPosition: 0@0 facingDirection: #East.
 	
 	marsRover receiveSequenceOfCommands: 'r'.
 	
-	self assert: (marsRover position: 0@0 facingTo: #WestCompass)
+	self assert: (marsRover isAtPosition: 0@0 facingDirection: #South)
 	! !
 
-!MarsRoverTest methodsFor: 'testRotation' stamp: 'AH 12/6/2020 16:21:10'!
-test06
+!MarsRoverTest methodsFor: 'testRotation' stamp: 'AF 12/6/2020 18:33:03'!
+test12RotateLeftCommandShouldRotateRoverFromSouthToEast
 
 	| marsRover |
-	marsRover := MarsRover inPosition: 0@0 inDirection: #EastCompass.
+	marsRover := MarsRover atPosition: 0@0 facingDirection: #South.
 	
 	marsRover receiveSequenceOfCommands: 'l'.
 	
-	self assert: (marsRover position: 0@0 facingTo: #NorthCompass)
+	self assert: (marsRover isAtPosition: 0@0 facingDirection: #East)
 	! !
 
-!MarsRoverTest methodsFor: 'testRotation' stamp: 'AH 12/6/2020 16:21:20'!
-test07
+!MarsRoverTest methodsFor: 'testRotation' stamp: 'AF 12/6/2020 18:33:03'!
+test13RotateRightCommandShouldRotateRoverFromSouthToWest
 
 	| marsRover |
-	marsRover := MarsRover inPosition: 0@0 inDirection: #EastCompass.
+	marsRover := MarsRover atPosition: 0@0 facingDirection: #South.
 	
 	marsRover receiveSequenceOfCommands: 'r'.
 	
-	self assert: (marsRover position: 0@0 facingTo: #SouthCompass)
+	self assert: (marsRover isAtPosition: 0@0 facingDirection: #West)
 	! !
 
-!MarsRoverTest methodsFor: 'testRotation' stamp: 'AH 12/6/2020 16:21:29'!
-test08
+!MarsRoverTest methodsFor: 'testRotation' stamp: 'AF 12/6/2020 18:33:03'!
+test16RotateLeftCommandShouldRotateRoverFromWestToSouth
 
 	| marsRover |
-	marsRover := MarsRover inPosition: 0@0 inDirection: #WestCompass.
+	marsRover := MarsRover atPosition: 0@0 facingDirection: #West.
 	
 	marsRover receiveSequenceOfCommands: 'l'.
 	
-	self assert: (marsRover position: 0@0 facingTo: #SouthCompass)
+	self assert: (marsRover isAtPosition: 0@0 facingDirection: #South)
 	! !
 
-!MarsRoverTest methodsFor: 'testRotation' stamp: 'AH 12/6/2020 16:21:29'!
-test09
+!MarsRoverTest methodsFor: 'testRotation' stamp: 'AF 12/6/2020 18:33:03'!
+test17RotateRightCommandShouldRotateRoverFromWestToNorth
 
 	| marsRover |
-	marsRover := MarsRover inPosition: 0@0 inDirection: #WestCompass.
+	marsRover := MarsRover atPosition: 0@0 facingDirection: #West.
 	
 	marsRover receiveSequenceOfCommands: 'r'.
 	
-	self assert: (marsRover position: 0@0 facingTo: #NorthCompass)
+	self assert: (marsRover isAtPosition: 0@0 facingDirection: #North)
 	! !
 
 
-!MarsRoverTest methodsFor: 'testMovement' stamp: 'AH 12/6/2020 16:21:09'!
-test10NorteForward
+!MarsRoverTest methodsFor: 'testMovement' stamp: 'AF 12/6/2020 18:33:03'!
+test02ForwardCommandShouldMoveRoverOnePositionNorthFacingNorth
 
 	| marsRover |
-	marsRover := MarsRover inPosition: 0@0 inDirection: #NorthCompass.
+	marsRover := MarsRover atPosition: 0@0 facingDirection: #North.
 	
 	marsRover receiveSequenceOfCommands: 'f'.
 	
-	self assert: (marsRover position: 0@1 facingTo: #NorthCompass)
+	self assert: (marsRover isAtPosition: 0@1 facingDirection: #North)
 	! !
 
-!MarsRoverTest methodsFor: 'testMovement' stamp: 'AH 12/6/2020 16:21:10'!
-test11NorteBackwards
+!MarsRoverTest methodsFor: 'testMovement' stamp: 'AF 12/6/2020 18:33:03'!
+test03BackwardsCommandShouldMoveRoverOnePositionSouthFacingNorth
 
 	| marsRover |
-	marsRover := MarsRover inPosition: 0@0 inDirection: #NorthCompass.
+	marsRover := MarsRover atPosition: 0@0 facingDirection: #North.
 	
 	marsRover receiveSequenceOfCommands: 'b'.
 	
-	self assert: (marsRover position: 0@-1 facingTo: #NorthCompass)
+	self assert: (marsRover isAtPosition: 0@-1 facingDirection: #North)
 	! !
 
-!MarsRoverTest methodsFor: 'testMovement' stamp: 'AH 12/6/2020 16:21:20'!
-test12
+!MarsRoverTest methodsFor: 'testMovement' stamp: 'AF 12/6/2020 18:33:03'!
+test06ForwardCommandShouldMoveRoverOnePositionEastFacingEast
 
 	| marsRover |
-	marsRover := MarsRover inPosition: 0@0 inDirection: #SouthCompass.
+	marsRover := MarsRover atPosition: 0@0 facingDirection: #East.
 	
 	marsRover receiveSequenceOfCommands: 'f'.
 	
-	self assert: (marsRover position: 0@-1 facingTo: #SouthCompass)
+	self assert: (marsRover isAtPosition: 1@0 facingDirection: #East)
 	! !
 
-!MarsRoverTest methodsFor: 'testMovement' stamp: 'AH 12/6/2020 16:21:20'!
-test13
+!MarsRoverTest methodsFor: 'testMovement' stamp: 'AF 12/6/2020 18:33:03'!
+test07BackwardsCommandShouldMoveRoverOnePositionWestFacingEast
 
 	| marsRover |
-	marsRover := MarsRover inPosition: 0@0 inDirection: #SouthCompass.
+	marsRover := MarsRover atPosition: 0@0 facingDirection: #East.
 	
 	marsRover receiveSequenceOfCommands: 'b'.
 	
-	self assert: (marsRover position: 0@1 facingTo: #SouthCompass)
+	self assert: (marsRover isAtPosition: -1@0 facingDirection: #East)
 	! !
 
-!MarsRoverTest methodsFor: 'testMovement' stamp: 'AH 12/6/2020 16:13:20'!
-test14
+!MarsRoverTest methodsFor: 'testMovement' stamp: 'AF 12/6/2020 18:33:03'!
+test10ForwardCommandShouldMoveRoverOnePositionSouthFacingSouth
 
 	| marsRover |
-	marsRover := MarsRover inPosition: 0@0 inDirection: #EastCompass.
+	marsRover := MarsRover atPosition: 0@0 facingDirection: #South.
 	
 	marsRover receiveSequenceOfCommands: 'f'.
 	
-	self assert: (marsRover position: 1@0 facingTo: #EastCompass)
+	self assert: (marsRover isAtPosition: 0@-1 facingDirection: #South)
 	! !
 
-!MarsRoverTest methodsFor: 'testMovement' stamp: 'AH 12/6/2020 16:13:20'!
-test15
+!MarsRoverTest methodsFor: 'testMovement' stamp: 'AF 12/6/2020 18:33:03'!
+test11BackwardsCommandShouldMoveRoverOnePoisitionNorthFacingSouth
 
 	| marsRover |
-	marsRover := MarsRover inPosition: 0@0 inDirection: #EastCompass.
+	marsRover := MarsRover atPosition: 0@0 facingDirection: #South.
 	
 	marsRover receiveSequenceOfCommands: 'b'.
 	
-	self assert: (marsRover position: -1@0 facingTo: #EastCompass)
+	self assert: (marsRover isAtPosition: 0@1 facingDirection: #South)
 	! !
 
-!MarsRoverTest methodsFor: 'testMovement' stamp: 'AH 12/6/2020 16:21:29'!
-test16
+!MarsRoverTest methodsFor: 'testMovement' stamp: 'AF 12/6/2020 18:33:03'!
+test14ForwardCommandShouldMoveRoverOnePositionWestFacingWest
 
 	| marsRover |
-	marsRover := MarsRover inPosition: 0@0 inDirection: #WestCompass.
+	marsRover := MarsRover atPosition: 0@0 facingDirection: #West.
 	
 	marsRover receiveSequenceOfCommands: 'f'.
 	
-	self assert: (marsRover position: -1@0 facingTo: #WestCompass)
+	self assert: (marsRover isAtPosition: -1@0 facingDirection: #West)
 	! !
 
-!MarsRoverTest methodsFor: 'testMovement' stamp: 'AH 12/6/2020 16:21:29'!
-test17
+!MarsRoverTest methodsFor: 'testMovement' stamp: 'AF 12/6/2020 18:33:03'!
+test15BackwardsCommandShouldMoveRoverOnePositionEastFacingWest
 
 	| marsRover |
-	marsRover := MarsRover inPosition: 0@0 inDirection: #WestCompass.
+	marsRover := MarsRover atPosition: 0@0 facingDirection: #West.
 	
 	marsRover receiveSequenceOfCommands: 'b'.
 	
-	self assert: (marsRover position: 1@0 facingTo: #WestCompass)
+	self assert: (marsRover isAtPosition: 1@0 facingDirection: #West)
 	! !
-
-
-!classDefinition: #Compass category: 'MarsRover'!
-Object subclass: #Compass
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'MarsRover'!
-
-!Compass methodsFor: 'as yet unclassified' stamp: 'AH 12/6/2020 16:06:04'!
-direction
-	self subclassResponsibility .! !
-
-!Compass methodsFor: 'as yet unclassified' stamp: 'AH 12/6/2020 16:01:38'!
-rotateLeft:aMarsRover
-	self subclassResponsibility.! !
-
-"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
-
-!classDefinition: 'Compass class' category: 'MarsRover'!
-Compass class
-	instanceVariableNames: ''!
-
-!Compass class methodsFor: 'as yet unclassified' stamp: 'AH 12/6/2020 16:21:29'!
-withDirection:aDirection
-		
-	aDirection = #NorthCompass ifTrue: [^NorthCompass new].
-	aDirection = #SouthCompass ifTrue: [^SouthCompass new].
-	aDirection= #EastCompass ifTrue: [^EastCompass new].
-	aDirection= #WestCompass ifTrue: [^WestCompass new].! !
-
-
-!classDefinition: #EastCompass category: 'MarsRover'!
-Compass subclass: #EastCompass
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'MarsRover'!
-
-!EastCompass methodsFor: 'as yet unclassified' stamp: 'AH 12/6/2020 16:13:19'!
-direction
-	^#EastCompass.! !
-
-!EastCompass methodsFor: 'as yet unclassified' stamp: 'AH 12/6/2020 15:58:44'!
-rotateLeft:aMarsRover
-	aMarsRover rotateToNorth.
-! !
-
-!EastCompass methodsFor: 'as yet unclassified' stamp: 'AH 12/6/2020 16:29:04'!
-rotateRight:aMarsRover
-	aMarsRover rotateToSouth.
-! !
-
-!EastCompass methodsFor: 'as yet unclassified' stamp: 'AH 12/6/2020 16:49:49'!
-setToBackward:aMarsRover
-	
-	aMarsRover moveOnePositionInXNegative .
-"	direction = #NorthCompass ifTrue: [^position := position + (0@-1)].
-	direction = #SouthCompass ifTrue: [^position := position + (0@1)].
-	direction = #EastCompass ifTrue: [^position := position + (-1@0)].
-	direction = #WestCompass ifTrue: [^position := position + (1@0)].
-"! !
-
-!EastCompass methodsFor: 'as yet unclassified' stamp: 'AH 12/6/2020 16:49:30'!
-setToForward:aMarsRover
-	
-	aMarsRover moveOnePositionInXPositive.
-	"
-
-	direction = #NorthCompass ifTrue: [^position := position + (0@1)].
-	direction = #SouthCompass ifTrue: [^position := position + (0@-1)].
-	direction = #WestCompass ifTrue: [^position := position + (-1@0)]."! !
-
-
-!classDefinition: #NorthCompass category: 'MarsRover'!
-Compass subclass: #NorthCompass
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'MarsRover'!
-
-!NorthCompass methodsFor: 'as yet unclassified' stamp: 'AH 12/6/2020 16:21:10'!
-direction
-	^#NorthCompass.! !
-
-!NorthCompass methodsFor: 'as yet unclassified' stamp: 'AH 12/6/2020 16:22:57'!
-rotateLeft:aMarsRover
-	aMarsRover rotateToWest.
-! !
-
-!NorthCompass methodsFor: 'as yet unclassified' stamp: 'AH 12/6/2020 16:29:29'!
-rotateRight:aMarsRover
-	aMarsRover rotateToEast.
-! !
-
-!NorthCompass methodsFor: 'as yet unclassified' stamp: 'AH 12/6/2020 16:50:09'!
-setToBackward:aMarsRover
-	
-	aMarsRover moveOnePositionInYNegative .
-"	direction = #NorthCompass ifTrue: [^position := position + (0@-1)].
-	direction = #SouthCompass ifTrue: [^position := position + (0@1)].
-	direction = #EastCompass ifTrue: [^position := position + (-1@0)].
-	direction = #WestCompass ifTrue: [^position := position + (1@0)].
-"! !
-
-!NorthCompass methodsFor: 'as yet unclassified' stamp: 'AH 12/6/2020 16:47:23'!
-setToForward:aMarsRover
-	
-	aMarsRover moveOnePositionInYPositive.
-	"
-	direction = #SouthCompass ifTrue: [^position := position + (0@-1)].
-	direction = #WestCompass ifTrue: [^position := position + (-1@0)]."! !
-
-
-!classDefinition: #SouthCompass category: 'MarsRover'!
-Compass subclass: #SouthCompass
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'MarsRover'!
-
-!SouthCompass methodsFor: 'as yet unclassified' stamp: 'AH 12/6/2020 16:21:20'!
-direction
-	^#SouthCompass.! !
-
-!SouthCompass methodsFor: 'as yet unclassified' stamp: 'AH 12/6/2020 16:24:42'!
-rotateLeft:aMarsRover
-	aMarsRover rotateToEast.
-! !
-
-!SouthCompass methodsFor: 'as yet unclassified' stamp: 'AH 12/6/2020 16:29:41'!
-rotateRight:aMarsRover
-	aMarsRover rotateToWest.
-! !
-
-!SouthCompass methodsFor: 'as yet unclassified' stamp: 'AH 12/6/2020 16:50:27'!
-setToBackward:aMarsRover
-	
-	aMarsRover moveOnePositionInYPositive.
-"	direction = #NorthCompass ifTrue: [^position := position + (0@-1)].
-	direction = #SouthCompass ifTrue: [^position := position + (0@1)].
-	direction = #EastCompass ifTrue: [^position := position + (-1@0)].
-	direction = #WestCompass ifTrue: [^position := position + (1@0)].
-"! !
-
-!SouthCompass methodsFor: 'as yet unclassified' stamp: 'AH 12/6/2020 16:47:52'!
-setToForward:aMarsRover
-	
-	aMarsRover moveOnePositionInYNegative .
-	"
-	direction = #WestCompass ifTrue: [^position := position + (-1@0)]."! !
-
-
-!classDefinition: #WestCompass category: 'MarsRover'!
-Compass subclass: #WestCompass
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'MarsRover'!
-
-!WestCompass methodsFor: 'as yet unclassified' stamp: 'AH 12/6/2020 16:21:29'!
-direction
-	^#WestCompass.! !
-
-!WestCompass methodsFor: 'as yet unclassified' stamp: 'AH 12/6/2020 16:24:58'!
-rotateLeft:aMarsRover
-	aMarsRover rotateToSouth.
-! !
-
-!WestCompass methodsFor: 'as yet unclassified' stamp: 'AH 12/6/2020 16:29:54'!
-rotateRight:aMarsRover
-	aMarsRover rotateToNorth.
-! !
-
-!WestCompass methodsFor: 'as yet unclassified' stamp: 'AH 12/6/2020 16:50:49'!
-setToBackward:aMarsRover
-	
-	aMarsRover moveOnePositionInXPositive .
-"	direction = #NorthCompass ifTrue: [^position := position + (0@-1)].
-	direction = #SouthCompass ifTrue: [^position := position + (0@1)].
-	direction = #EastCompass ifTrue: [^position := position + (-1@0)].
-	direction = #WestCompass ifTrue: [^position := position + (1@0)].
-"! !
-
-!WestCompass methodsFor: 'as yet unclassified' stamp: 'AH 12/6/2020 16:48:08'!
-setToForward:aMarsRover
-	
-	aMarsRover moveOnePositionInXNegative .! !
 
 
 !classDefinition: #MarsRover category: 'MarsRover'!
@@ -401,85 +224,88 @@ Object subclass: #MarsRover
 	poolDictionaries: ''
 	category: 'MarsRover'!
 
-!MarsRover methodsFor: 'initialization' stamp: 'AH 12/6/2020 15:47:30'!
-initializeInPosition: aPosition inDirection: aMarsRoverCompass 
+!MarsRover methodsFor: 'initialization' stamp: 'AF 12/6/2020 18:26:26'!
+initializeAtPosition: aPosition facingDirection: aMarsRoverCompass 
 	position := aPosition.
 	compass := aMarsRoverCompass .! !
 
 
-!MarsRover methodsFor: 'as yet unclassified' stamp: 'AH 12/6/2020 16:49:15'!
-goBackwards
-	compass setToBackward: self.
+!MarsRover methodsFor: 'private - commands' stamp: 'AF 12/6/2020 18:36:34'!
+executeBackwardsCommand
+	compass moveRoverBackwards: self.
 ! !
 
-!MarsRover methodsFor: 'as yet unclassified' stamp: 'AH 12/6/2020 16:38:15'!
-goForward
-	compass setToForward: self.
-! !
+!MarsRover methodsFor: 'private - commands' stamp: 'AF 12/6/2020 18:34:47'!
+executeCommand: aCommand
 
-!MarsRover methodsFor: 'as yet unclassified' stamp: 'AH 12/6/2020 16:46:47'!
-moveOnePositionInXNegative
-	position := position - (1@0).! !
-
-!MarsRover methodsFor: 'as yet unclassified' stamp: 'AH 12/6/2020 16:44:53'!
-moveOnePositionInXPositive
-	position  := position + (1@0).! !
-
-!MarsRover methodsFor: 'as yet unclassified' stamp: 'AH 12/6/2020 16:46:58'!
-moveOnePositionInYNegative
-	position := position - (0@1).! !
-
-!MarsRover methodsFor: 'as yet unclassified' stamp: 'AH 12/6/2020 16:46:20'!
-moveOnePositionInYPositive
-	position := position + (0@1)! !
-
-!MarsRover methodsFor: 'as yet unclassified' stamp: 'AH 12/6/2020 16:05:49'!
-position: aPosition facingTo: aDirection
-	
-	^ (position = aPosition and: [compass direction = aDirection])! !
-
-!MarsRover methodsFor: 'as yet unclassified' stamp: 'AF 12/3/2020 17:56:23'!
-receiveCommand: aCommand
-
-	aCommand = $f ifTrue: [self goForward]. 
-	aCommand = $b ifTrue: [self goBackwards].
-	aCommand = $l ifTrue: [self rotateLeft].
-	aCommand = $r ifTrue: [self rotateRight].
+	aCommand = $f ifTrue: [self executeForwardCommand]. 
+	aCommand = $b ifTrue: [self executeBackwardsCommand].
+	aCommand = $l ifTrue: [self executeRotateLeftCommand].
+	aCommand = $r ifTrue: [self executeRotateRightCommand].
 	! !
 
-!MarsRover methodsFor: 'as yet unclassified' stamp: 'AH 12/5/2020 16:49:48'!
+!MarsRover methodsFor: 'private - commands' stamp: 'AF 12/6/2020 18:37:59'!
+executeForwardCommand
+	compass moveRoverForward: self.
+! !
+
+!MarsRover methodsFor: 'private - commands' stamp: 'AF 12/6/2020 18:37:02'!
+executeRotateLeftCommand
+	compass rotateRoverLeft: self.! !
+
+!MarsRover methodsFor: 'private - commands' stamp: 'AF 12/6/2020 18:37:12'!
+executeRotateRightCommand
+	compass rotateRoverRight: self.! !
+
+!MarsRover methodsFor: 'private - commands' stamp: 'AF 12/6/2020 18:33:03'!
 receiveSequenceOfCommands: aSequenceOfCommands
 	|acceptedCommands|
 	acceptedCommands := #($l $r $f $b).
 	
 	aSequenceOfCommands do: [:aCommand | 
 		(acceptedCommands includes: aCommand) ifFalse: [^self].
-		self receiveCommand: aCommand.
+		self executeCommand: aCommand.
 		]! !
 
-!MarsRover methodsFor: 'as yet unclassified' stamp: 'AH 12/6/2020 16:01:02'!
-rotateLeft
-	compass rotateLeft: self.! !
 
-!MarsRover methodsFor: 'as yet unclassified' stamp: 'AH 12/6/2020 16:36:03'!
-rotateRight
-	compass rotateRight: self.! !
+!MarsRover methodsFor: 'private - movement' stamp: 'AF 12/6/2020 18:40:30'!
+moveOnePositionEast
+	position  := position + (1@0).! !
 
-!MarsRover methodsFor: 'as yet unclassified' stamp: 'AH 12/6/2020 16:25:58'!
+!MarsRover methodsFor: 'private - movement' stamp: 'AF 12/6/2020 18:39:54'!
+moveOnePositionNorth
+	position := position + (0@1)! !
+
+!MarsRover methodsFor: 'private - movement' stamp: 'AF 12/6/2020 18:40:08'!
+moveOnePositionSouth
+	position := position - (0@1).! !
+
+!MarsRover methodsFor: 'private - movement' stamp: 'AF 12/6/2020 18:39:26'!
+moveOnePositionWest
+	position := position - (1@0).! !
+
+
+!MarsRover methodsFor: 'private - rotation' stamp: 'AF 12/6/2020 18:43:54'!
 rotateToEast
-	compass := Compass withDirection: #EastCompass.! !
+	compass := MarsRoverCompass withDirection: #East.! !
 
-!MarsRover methodsFor: 'as yet unclassified' stamp: 'AH 12/6/2020 16:21:09'!
+!MarsRover methodsFor: 'private - rotation' stamp: 'AF 12/6/2020 18:43:54'!
 rotateToNorth
-	compass := Compass withDirection: #NorthCompass.! !
+	compass := MarsRoverCompass withDirection: #North.! !
 
-!MarsRover methodsFor: 'as yet unclassified' stamp: 'AH 12/6/2020 16:25:37'!
+!MarsRover methodsFor: 'private - rotation' stamp: 'AF 12/6/2020 18:43:54'!
 rotateToSouth
-	compass := Compass withDirection: #SouthCompass.! !
+	compass := MarsRoverCompass withDirection: #South.! !
 
-!MarsRover methodsFor: 'as yet unclassified' stamp: 'AH 12/6/2020 16:26:28'!
+!MarsRover methodsFor: 'private - rotation' stamp: 'AF 12/6/2020 18:43:54'!
 rotateToWest
-	compass := Compass withDirection: #WestCompass.! !
+	compass := MarsRoverCompass withDirection: #West.! !
+
+
+!MarsRover methodsFor: 'testing' stamp: 'AF 12/6/2020 18:27:01'!
+isAtPosition: aPosition facingDirection: aDirection
+	
+	^ (position = aPosition and: [compass direction = aDirection])! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -487,9 +313,198 @@ rotateToWest
 MarsRover class
 	instanceVariableNames: ''!
 
-!MarsRover class methodsFor: 'instance creation' stamp: 'AH 12/6/2020 15:50:16'!
-inPosition: aPosition inDirection: aDirection 
+!MarsRover class methodsFor: 'instance creation' stamp: 'AF 12/6/2020 18:43:54'!
+atPosition: aPosition facingDirection: aDirection 
 	|compass|
-	compass := Compass withDirection:aDirection.
+	compass := MarsRoverCompass withDirection:aDirection.
 	
-	^self new initializeInPosition: aPosition inDirection: compass. ! !
+	^self new initializeAtPosition: aPosition facingDirection: compass. ! !
+
+
+!classDefinition: #MarsRoverCompass category: 'MarsRover'!
+Object subclass: #MarsRoverCompass
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'MarsRover'!
+
+!MarsRoverCompass methodsFor: 'accessing' stamp: 'AH 12/6/2020 16:06:04'!
+direction
+	self subclassResponsibility .! !
+
+
+!MarsRoverCompass methodsFor: 'MarsRover commands' stamp: 'AF 12/6/2020 18:36:34'!
+moveRoverBackwards: aMarsRover
+	self subclassResponsibility.! !
+
+!MarsRoverCompass methodsFor: 'MarsRover commands' stamp: 'AF 12/6/2020 18:37:59'!
+moveRoverForward: aMarsRover
+	self subclassResponsibility.! !
+
+!MarsRoverCompass methodsFor: 'MarsRover commands' stamp: 'AF 12/6/2020 18:37:02'!
+rotateRoverLeft:aMarsRover
+	self subclassResponsibility.! !
+
+!MarsRoverCompass methodsFor: 'MarsRover commands' stamp: 'AF 12/6/2020 18:37:12'!
+rotateRoverRight: aMarsRover
+	self subclassResponsibility.! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'MarsRoverCompass class' category: 'MarsRover'!
+MarsRoverCompass class
+	instanceVariableNames: ''!
+
+!MarsRoverCompass class methodsFor: 'as yet unclassified' stamp: 'AF 12/6/2020 17:46:07'!
+withDirection:aDirection
+		
+	aDirection = #North ifTrue: [^NorthCompass new].
+	aDirection = #South ifTrue: [^SouthCompass new].
+	aDirection= #East ifTrue: [^EastCompass new].
+	aDirection= #West ifTrue: [^WestCompass new].! !
+
+
+!classDefinition: #EastCompass category: 'MarsRover'!
+MarsRoverCompass subclass: #EastCompass
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'MarsRover'!
+
+!EastCompass methodsFor: 'accessing' stamp: 'AF 12/6/2020 17:41:08'!
+direction
+	^#East.! !
+
+
+!EastCompass methodsFor: 'MarsRover commands' stamp: 'AF 12/6/2020 18:39:26'!
+moveRoverBackwards: aMarsRover
+	
+	aMarsRover moveOnePositionWest. ! !
+
+!EastCompass methodsFor: 'MarsRover commands' stamp: 'AF 12/6/2020 18:40:30'!
+moveRoverForward: aMarsRover
+	
+	aMarsRover moveOnePositionEast.
+
+	! !
+
+!EastCompass methodsFor: 'MarsRover commands' stamp: 'AF 12/6/2020 18:37:02'!
+rotateRoverLeft: aMarsRover
+
+	aMarsRover rotateToNorth.
+! !
+
+!EastCompass methodsFor: 'MarsRover commands' stamp: 'AF 12/6/2020 18:37:12'!
+rotateRoverRight: aMarsRover
+
+	aMarsRover rotateToSouth.
+! !
+
+
+!classDefinition: #NorthCompass category: 'MarsRover'!
+MarsRoverCompass subclass: #NorthCompass
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'MarsRover'!
+
+!NorthCompass methodsFor: 'accessing' stamp: 'AF 12/6/2020 17:41:15'!
+direction
+
+	^#North.! !
+
+
+!NorthCompass methodsFor: 'MarsRover commands' stamp: 'AF 12/6/2020 18:40:08'!
+moveRoverBackwards: aMarsRover
+	
+	aMarsRover moveOnePositionSouth .
+! !
+
+!NorthCompass methodsFor: 'MarsRover commands' stamp: 'AF 12/6/2020 18:39:54'!
+moveRoverForward: aMarsRover
+	
+	aMarsRover moveOnePositionNorth.! !
+
+!NorthCompass methodsFor: 'MarsRover commands' stamp: 'AF 12/6/2020 18:37:02'!
+rotateRoverLeft: aMarsRover
+
+	aMarsRover rotateToWest.
+! !
+
+!NorthCompass methodsFor: 'MarsRover commands' stamp: 'AF 12/6/2020 18:37:12'!
+rotateRoverRight: aMarsRover
+
+	aMarsRover rotateToEast.
+! !
+
+
+!classDefinition: #SouthCompass category: 'MarsRover'!
+MarsRoverCompass subclass: #SouthCompass
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'MarsRover'!
+
+!SouthCompass methodsFor: 'accessing' stamp: 'AF 12/6/2020 17:41:21'!
+direction
+
+	^#South.! !
+
+
+!SouthCompass methodsFor: 'MarsRover commands' stamp: 'AF 12/6/2020 18:39:54'!
+moveRoverBackwards: aMarsRover
+	
+	aMarsRover moveOnePositionNorth.! !
+
+!SouthCompass methodsFor: 'MarsRover commands' stamp: 'AF 12/6/2020 18:40:08'!
+moveRoverForward: aMarsRover
+	
+	aMarsRover moveOnePositionSouth .! !
+
+!SouthCompass methodsFor: 'MarsRover commands' stamp: 'AF 12/6/2020 18:37:02'!
+rotateRoverLeft: aMarsRover
+	
+	aMarsRover rotateToEast.
+! !
+
+!SouthCompass methodsFor: 'MarsRover commands' stamp: 'AF 12/6/2020 18:37:12'!
+rotateRoverRight: aMarsRover
+
+	aMarsRover rotateToWest.
+! !
+
+
+!classDefinition: #WestCompass category: 'MarsRover'!
+MarsRoverCompass subclass: #WestCompass
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'MarsRover'!
+
+!WestCompass methodsFor: 'accessing' stamp: 'AF 12/6/2020 17:41:27'!
+direction
+
+	^#West.! !
+
+
+!WestCompass methodsFor: 'MarsRover commands' stamp: 'AF 12/6/2020 18:40:30'!
+moveRoverBackwards: aMarsRover
+	
+	aMarsRover moveOnePositionEast! !
+
+!WestCompass methodsFor: 'MarsRover commands' stamp: 'AF 12/6/2020 18:39:26'!
+moveRoverForward: aMarsRover
+	
+	aMarsRover moveOnePositionWest .! !
+
+!WestCompass methodsFor: 'MarsRover commands' stamp: 'AF 12/6/2020 18:37:02'!
+rotateRoverLeft: aMarsRover
+
+	aMarsRover rotateToSouth.
+! !
+
+!WestCompass methodsFor: 'MarsRover commands' stamp: 'AF 12/6/2020 18:37:12'!
+rotateRoverRight: aMarsRover
+	
+	aMarsRover rotateToNorth.
+! !
