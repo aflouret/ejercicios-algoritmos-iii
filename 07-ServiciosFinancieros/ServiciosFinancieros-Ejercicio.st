@@ -139,7 +139,7 @@ test02DepositIncreasesBalanceOnTransactionValue
 	self assert: 100 * peso equals: account balance
 ! !
 
-!ReceptiveAccountTest methodsFor: 'tests' stamp: 'LL 9/20/2020 20:55:48'!
+!ReceptiveAccountTest methodsFor: 'tests' stamp: 'AH 12/5/2020 21:12:10'!
 test03WithdrawDecreasesBalanceOnTransactionValue 
 
 	| account |
@@ -148,10 +148,10 @@ test03WithdrawDecreasesBalanceOnTransactionValue
 	Deposit register: 100 * peso on: account.
 	Withdraw register: 50 * peso on: account.
 		
-	self assert: 50 * peso equals: account balance
+	self assert: 50 * peso equals: account balance.
 ! !
 
-!ReceptiveAccountTest methodsFor: 'tests' stamp: 'LL 9/20/2020 20:55:54'!
+!ReceptiveAccountTest methodsFor: 'tests' stamp: 'AH 12/5/2020 21:26:54'!
 test04WithdrawValueMustBePositive 
 
 	| account withdrawValue |
@@ -159,7 +159,7 @@ test04WithdrawValueMustBePositive
 	account := ReceptiveAccount new.
 	withdrawValue := 50 * peso.
 	
-	self assert: withdrawValue equals: (Withdraw register: withdrawValue on: account) value
+	self assert: withdrawValue equals: (Withdraw register: withdrawValue on: account) value.
 ! !
 
 !ReceptiveAccountTest methodsFor: 'tests' stamp: 'LL 9/20/2020 20:56:01'!
@@ -189,6 +189,39 @@ test06ReceptiveAccountDoNotKnowNotRegisteredTransactions
 ! !
 
 
+!classDefinition: #TransferTest category: 'ServiciosFinancieros-Ejercicio'!
+TestCase subclass: #TransferTest
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'ServiciosFinancieros-Ejercicio'!
+
+!TransferTest methodsFor: 'as yet unclassified' stamp: 'AH 12/5/2020 20:23:54'!
+test01
+	
+	|originAccount destinationAccount transfer|
+	originAccount := ReceptiveAccount new.
+	destinationAccount := ReceptiveAccount new.
+	
+	transfer := Transfer from:originAccount To:destinationAccount anAmountOf:0*peso.
+	self assert:(transfer hasOriginAccount:originAccount hasDestinationAccount: destinationAccount forAnAmountOf: 0*peso).
+
+	! !
+
+!TransferTest methodsFor: 'as yet unclassified' stamp: 'AH 12/5/2020 21:13:32'!
+test02
+	
+	|originAccount destinationAccount |
+	originAccount := ReceptiveAccount new.
+	destinationAccount := ReceptiveAccount new.
+	Deposit register: 100*peso on:originAccount .
+	Transfer from:originAccount To:destinationAccount anAmountOf:100*peso.
+
+	self assert: 0 * peso equals: originAccount balance.
+	self assert: 100 * peso equals: destinationAccount balance.
+	! !
+
+
 !classDefinition: #AccountTransaction category: 'ServiciosFinancieros-Ejercicio'!
 Object subclass: #AccountTransaction
 	instanceVariableNames: ''
@@ -196,7 +229,7 @@ Object subclass: #AccountTransaction
 	poolDictionaries: ''
 	category: 'ServiciosFinancieros-Ejercicio'!
 
-!AccountTransaction methodsFor: 'value' stamp: 'HernanWilkinson 9/12/2011 12:25'!
+!AccountTransaction methodsFor: 'value' stamp: 'AH 12/5/2020 21:25:27'!
 value 
 
 	self subclassResponsibility ! !
@@ -261,10 +294,10 @@ initializeFor: aValue
 	value := aValue ! !
 
 
-!Withdraw methodsFor: 'value' stamp: 'HernanWilkinson 7/13/2011 18:33'!
+!Withdraw methodsFor: 'value' stamp: 'AH 12/5/2020 19:06:43'!
 value
 
-	^ value! !
+	^ value.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -402,10 +435,19 @@ initialize
 	transactions := OrderedCollection new.! !
 
 
-!ReceptiveAccount methodsFor: 'main protocol' stamp: 'LL 9/21/2020 01:37:42'!
+!ReceptiveAccount methodsFor: 'main protocol' stamp: 'AH 12/5/2020 21:30:19'!
 balance
-
-	^transactions sum: [ :aTransaction | aTransaction value ] ifEmpty: [ 0 * peso ]! !
+	|totalBalance|
+	totalBalance := 0.
+	transactions do: [ :aTransaction | 
+		(aTransaction isKindOf:Deposit) ifTrue: [ totalBalance := totalBalance + aTransaction value].
+		(aTransaction isKindOf:Withdraw) ifTrue: [ totalBalance := totalBalance - aTransaction value].
+		(aTransaction isKindOf: Transfer ) ifTrue: [
+			(aTransaction hasOriginAccount: self) ifTrue:[totalBalance := totalBalance - aTransaction amountOfTransfer].
+			(aTransaction hasDestinationAccount: self) ifTrue:[totalBalance := totalBalance + aTransaction amountOfTransfer].
+			].
+		].
+	^totalBalance.! !
 
 !ReceptiveAccount methodsFor: 'main protocol' stamp: 'LL 9/20/2020 20:48:29'!
 hasRegistered: aTransaction
@@ -429,3 +471,51 @@ addedTo: aPortfolio
 isComposedBy: anAccount
 
 	^self = anAccount ! !
+
+
+!classDefinition: #Transfer category: 'ServiciosFinancieros-Ejercicio'!
+Object subclass: #Transfer
+	instanceVariableNames: 'originAccount destinationAccount amountOfTransfer'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'ServiciosFinancieros-Ejercicio'!
+
+!Transfer methodsFor: 'initialization' stamp: 'AH 12/5/2020 21:28:19'!
+initializeTransferWithOriginAccount: anOriginAccount toADestinationAccount: aDestinationAccount forAnAmountOf: anAmountOfTransfer 
+	originAccount := anOriginAccount.
+	destinationAccount := aDestinationAccount.
+	amountOfTransfer := anAmountOfTransfer.
+	
+	anOriginAccount register: self.
+	aDestinationAccount register:self.! !
+
+
+!Transfer methodsFor: 'testing' stamp: 'AH 12/5/2020 21:31:03'!
+hasDestinationAccount: aPossibleDestinationAccount
+
+	^ destinationAccount isComposedBy: aPossibleDestinationAccount! !
+
+!Transfer methodsFor: 'testing' stamp: 'AH 12/5/2020 21:19:47'!
+hasOriginAccount: aPossibleOriginAccount
+
+	^ originAccount isComposedBy: aPossibleOriginAccount! !
+
+!Transfer methodsFor: 'testing' stamp: 'AH 12/5/2020 21:31:03'!
+hasOriginAccount: aPossibleOriginAccount hasDestinationAccount: aPossibleDestinationAccount forAnAmountOf: aPossibleAmount 
+	^ (self hasOriginAccount: aPossibleOriginAccount) and:[self hasDestinationAccount: aPossibleDestinationAccount ] 
+	and:[amountOfTransfer = aPossibleAmount ].! !
+
+
+!Transfer methodsFor: 'as yet unclassified' stamp: 'AH 12/5/2020 21:24:18'!
+amountOfTransfer
+	^amountOfTransfer.! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'Transfer class' category: 'ServiciosFinancieros-Ejercicio'!
+Transfer class
+	instanceVariableNames: ''!
+
+!Transfer class methodsFor: 'as yet unclassified' stamp: 'AH 12/5/2020 20:11:57'!
+from: anOriginAccount To: aDestinationAccount anAmountOf: anAmountOfTransfer 
+	^self new initializeTransferWithOriginAccount: anOriginAccount toADestinationAccount:aDestinationAccount forAnAmountOf: anAmountOfTransfer.! !
