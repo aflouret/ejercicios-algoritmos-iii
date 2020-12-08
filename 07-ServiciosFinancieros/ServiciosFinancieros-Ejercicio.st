@@ -5,7 +5,7 @@ TestCase subclass: #PortfolioTest
 	poolDictionaries: ''
 	category: 'ServiciosFinancieros-Ejercicio'!
 
-!PortfolioTest methodsFor: 'tests' stamp: 'LL 9/20/2020 17:09:32'!
+!PortfolioTest methodsFor: 'tests' stamp: 'AF 12/8/2020 17:02:30'!
 test01PortfolioCanNotIncludeTheSameAccountMoreThanOnce
 
 	| account portfolio |
@@ -21,7 +21,7 @@ test01PortfolioCanNotIncludeTheSameAccountMoreThanOnce
 			self assert: 1 equals: portfolio accountsSize.
 			self assert: (portfolio hasAccount: account) ]! !
 
-!PortfolioTest methodsFor: 'tests' stamp: 'LL 9/20/2020 17:09:38'!
+!PortfolioTest methodsFor: 'tests' stamp: 'AF 12/8/2020 17:02:30'!
 test02PortfolioCanNotIncludeAccountOfItsPortfolios
 
 	| account simplePortfolio composedPortfolio |
@@ -38,7 +38,7 @@ test02PortfolioCanNotIncludeAccountOfItsPortfolios
 			self assert: 1 equals: composedPortfolio accountsSize.
 			self assert: (composedPortfolio hasAccount: simplePortfolio) ]! !
 
-!PortfolioTest methodsFor: 'tests' stamp: 'LL 9/20/2020 17:09:45'!
+!PortfolioTest methodsFor: 'tests' stamp: 'AF 12/8/2020 17:02:30'!
 test03PortfolioCanNotIncludeItself
 
 	| account simplePortfolio |
@@ -54,7 +54,7 @@ test03PortfolioCanNotIncludeItself
 			self assert: 1 equals: simplePortfolio accountsSize.
 			self assert: (simplePortfolio hasAccount: account) ]! !
 
-!PortfolioTest methodsFor: 'tests' stamp: 'LL 9/20/2020 17:09:51'!
+!PortfolioTest methodsFor: 'tests' stamp: 'AF 12/8/2020 17:02:30'!
 test04ComposedPortfolioCanNotHaveParentPortfolioAccount
 
 	| account simplePortfolio composedPortfolio |
@@ -71,7 +71,7 @@ test04ComposedPortfolioCanNotHaveParentPortfolioAccount
 			self assert: Portfolio canNotAddAccountErrorMessage equals: anError messageText.
 			self assert: simplePortfolio hasAccounts ]! !
 
-!PortfolioTest methodsFor: 'tests' stamp: 'LL 9/20/2020 17:09:57'!
+!PortfolioTest methodsFor: 'tests' stamp: 'AF 12/8/2020 17:02:30'!
 test05ComposedPortfolioCanNotHaveAccountOfAnyRootParentRecursively
 
 	| account leftParentPortfolio leftRootParentPortfolio portfolio rightParentPortfolio rightRootParentPortfolio |
@@ -93,7 +93,7 @@ test05ComposedPortfolioCanNotHaveAccountOfAnyRootParentRecursively
 			self assert: Portfolio canNotAddAccountErrorMessage equals: anError messageText.
 			self assert: portfolio hasAccounts ]! !
 
-!PortfolioTest methodsFor: 'tests' stamp: 'LL 9/20/2020 17:10:03'!
+!PortfolioTest methodsFor: 'tests' stamp: 'AF 12/8/2020 17:02:30'!
 test06PortfolioCanNotIncludeAnyOfTheComposedAccountOfPortfolioToAdd
 
 	| portfolioToAdd portfolioToModify rootPortfolio sharedAccount |
@@ -109,6 +109,59 @@ test06PortfolioCanNotIncludeAnyOfTheComposedAccountOfPortfolioToAdd
 		withExceptionDo: [ :anError | 
 			self assert: Portfolio canNotAddAccountErrorMessage equals: anError messageText.
 			self assert: portfolioToModify hasAccounts ]! !
+
+!PortfolioTest methodsFor: 'tests' stamp: 'AF 12/8/2020 16:45:08'!
+test07
+
+	| portfolio |
+	portfolio := Portfolio new.
+	
+	self assert: portfolio balance equals: 0*peso
+	! !
+
+!PortfolioTest methodsFor: 'tests' stamp: 'AF 12/8/2020 16:50:45'!
+test08
+
+	| portfolio account |
+	
+	account := ReceptiveAccount new.
+	portfolio := Portfolio with: account.
+	
+	Deposit register: 100 * peso on: account.
+	
+	self assert: portfolio balance equals: 100*peso
+	! !
+
+!PortfolioTest methodsFor: 'tests' stamp: 'AF 12/8/2020 16:57:20'!
+test09
+
+	| portfolio account anotherAccount |
+	
+	account := ReceptiveAccount new.
+	anotherAccount := ReceptiveAccount new.
+	portfolio := Portfolio with: account with: anotherAccount.
+	
+	Deposit register: 100 * peso on: account.
+	Deposit register: 200 * peso on: anotherAccount.
+
+	
+	self assert: portfolio balance equals: 300*peso
+	! !
+
+!PortfolioTest methodsFor: 'tests' stamp: 'AF 12/8/2020 17:19:36'!
+test10
+
+	| portfolio account anotherAccount deposit |
+	
+	account := ReceptiveAccount new.
+	anotherAccount := ReceptiveAccount new.
+	portfolio := Portfolio with: account with: anotherAccount.
+	
+	deposit := Deposit register: 100 * peso on: account.
+		
+	self assert: (portfolio hasRegistered: deposit)
+	
+	! !
 
 
 !classDefinition: #ReceptiveAccountTest category: 'ServiciosFinancieros-Ejercicio'!
@@ -208,17 +261,31 @@ test01
 
 	! !
 
-!TransferTest methodsFor: 'as yet unclassified' stamp: 'AH 12/5/2020 21:13:32'!
+!TransferTest methodsFor: 'as yet unclassified' stamp: 'AF 12/8/2020 15:56:49'!
 test02
 	
-	|originAccount destinationAccount |
+	|originAccount destinationAccount transfer |
 	originAccount := ReceptiveAccount new.
 	destinationAccount := ReceptiveAccount new.
 	Deposit register: 100*peso on:originAccount .
-	Transfer from:originAccount To:destinationAccount anAmountOf:100*peso.
+	transfer := Transfer from:originAccount To:destinationAccount anAmountOf:100*peso.
 
 	self assert: 0 * peso equals: originAccount balance.
 	self assert: 100 * peso equals: destinationAccount balance.
+	! !
+
+!TransferTest methodsFor: 'as yet unclassified' stamp: 'AF 12/8/2020 16:28:21'!
+test03
+	
+	|originAccount destinationAccount transfer|
+	originAccount := ReceptiveAccount new.
+	destinationAccount := ReceptiveAccount new.
+	Deposit register: 100*peso on:originAccount .
+	transfer := Transfer from:originAccount To:destinationAccount anAmountOf:100*peso.
+	
+	self assert: (transfer deposit value = (100*peso)).
+	self assert: (transfer withdraw value = (100*peso)).
+	
 	! !
 
 
@@ -264,6 +331,11 @@ initializeFor: aValue
 	value := aValue ! !
 
 
+!Deposit methodsFor: 'value' stamp: 'AF 12/8/2020 16:25:37'!
+isOfAmount: anAmount on: anAccount
+
+	^ anAmount = self value and: [anAccount]! !
+
 !Deposit methodsFor: 'value' stamp: 'HernanWilkinson 7/13/2011 18:38'!
 value
 
@@ -279,6 +351,14 @@ Deposit class
 for: aValue
 
 	^ self new initializeFor: aValue ! !
+
+
+!classDefinition: #TransferDeposit category: 'ServiciosFinancieros-Ejercicio'!
+Deposit subclass: #TransferDeposit
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'ServiciosFinancieros-Ejercicio'!
 
 
 !classDefinition: #Withdraw category: 'ServiciosFinancieros-Ejercicio'!
@@ -325,13 +405,23 @@ initialize
 	parents := OrderedCollection new.! !
 
 
-!Portfolio methodsFor: 'accounts management' stamp: 'HAW 5/25/2019 12:19:20'!
+!Portfolio methodsFor: 'accounts management' stamp: 'AF 12/8/2020 17:03:49'!
 add: accountToAdd
 
 	self assertCanAdd: accountToAdd.
 		
 	accounts add: accountToAdd.
 	accountToAdd addedTo: self 
+	! !
+
+!Portfolio methodsFor: 'accounts management' stamp: 'AF 12/8/2020 17:09:29'!
+addPortfolio: portfolioToAdd
+
+	"self assertCanAdd: accountToAdd."
+		
+	| portfolios |
+	portfolios add: portfolioToAdd.
+	"accountToAdd addedTo: self" 
 	! !
 
 
@@ -351,15 +441,22 @@ accountsSize
 	
 	^accounts size! !
 
+!Portfolio methodsFor: 'accessing' stamp: 'AF 12/8/2020 16:58:14'!
+balance
+	
+	self accountsSize = 0 ifTrue: [^ 0*peso].
 
-!Portfolio methodsFor: 'composition - private' stamp: 'HAW 5/25/2019 12:17:31'!
+	^  accounts sum: [:anAccount | anAccount balance]! !
+
+
+!Portfolio methodsFor: 'composition - private' stamp: 'AF 12/8/2020 17:03:49'!
 addRootParentsTo: rootParents
 
 	parents 
 		ifEmpty: [ rootParents add: self ] 
 		ifNotEmpty: [ parents do: [ :aParent | aParent addRootParentsTo: rootParents ]]! !
 
-!Portfolio methodsFor: 'composition - private' stamp: 'HAW 5/25/2019 12:02:59'!
+!Portfolio methodsFor: 'composition - private' stamp: 'AF 12/8/2020 17:03:49'!
 addedTo: aPortfolio 
 	
 	parents add: aPortfolio ! !
@@ -395,6 +492,12 @@ signalCanNotAddAccount
 	
 	self error: self class canNotAddAccountErrorMessage! !
 
+
+!Portfolio methodsFor: 'as yet unclassified' stamp: 'AF 12/8/2020 17:23:21'!
+hasRegistered: anAccountTransaction 
+	
+	accounts do: [:anAccount | ^ anAccount hasRegistered: anAccountTransaction]! !
+
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
 !classDefinition: 'Portfolio class' category: 'ServiciosFinancieros-Ejercicio'!
@@ -406,14 +509,14 @@ canNotAddAccountErrorMessage
 	
 	^'Can not add repeated account to a portfolio'! !
 
-!Portfolio class methodsFor: 'as yet unclassified' stamp: 'HAW 5/25/2019 11:18:21'!
+!Portfolio class methodsFor: 'as yet unclassified' stamp: 'AF 12/8/2020 17:03:49'!
 with: anAccount
 
 	^self new 
 		add: anAccount;
 		yourself! !
 
-!Portfolio class methodsFor: 'as yet unclassified' stamp: 'HAW 5/25/2019 11:23:59'!
+!Portfolio class methodsFor: 'as yet unclassified' stamp: 'AF 12/8/2020 17:03:49'!
 with: anAccount with: anotherAccount
 
 	^self new 
@@ -455,7 +558,7 @@ hasRegistered: aTransaction
 	^transactions includes: aTransaction
 ! !
 
-!ReceptiveAccount methodsFor: 'main protocol' stamp: 'HernanWilkinson 7/13/2011 18:37'!
+!ReceptiveAccount methodsFor: 'main protocol' stamp: 'AF 12/8/2020 17:02:30'!
 register: aTransaction
 
 	transactions add: aTransaction 
@@ -475,12 +578,25 @@ isComposedBy: anAccount
 
 !classDefinition: #Transfer category: 'ServiciosFinancieros-Ejercicio'!
 Object subclass: #Transfer
-	instanceVariableNames: 'originAccount destinationAccount amountOfTransfer'
+	instanceVariableNames: 'originAccount destinationAccount amountOfTransfer deposit withdraw'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'ServiciosFinancieros-Ejercicio'!
 
-!Transfer methodsFor: 'initialization' stamp: 'AH 12/5/2020 21:28:19'!
+!Transfer methodsFor: 'accessing' stamp: 'AF 12/8/2020 16:22:27'!
+deposit
+
+	^ deposit
+	! !
+
+!Transfer methodsFor: 'accessing' stamp: 'AF 12/8/2020 16:22:36'!
+withdraw
+
+	^ withdraw
+	! !
+
+
+!Transfer methodsFor: 'initialization' stamp: 'AF 12/8/2020 16:30:53'!
 initializeTransferWithOriginAccount: anOriginAccount toADestinationAccount: aDestinationAccount forAnAmountOf: anAmountOfTransfer 
 	originAccount := anOriginAccount.
 	destinationAccount := aDestinationAccount.
@@ -516,6 +632,6 @@ amountOfTransfer
 Transfer class
 	instanceVariableNames: ''!
 
-!Transfer class methodsFor: 'as yet unclassified' stamp: 'AH 12/5/2020 20:11:57'!
+!Transfer class methodsFor: 'as yet unclassified' stamp: 'AF 12/8/2020 16:29:29'!
 from: anOriginAccount To: aDestinationAccount anAmountOf: anAmountOfTransfer 
 	^self new initializeTransferWithOriginAccount: anOriginAccount toADestinationAccount:aDestinationAccount forAnAmountOf: anAmountOfTransfer.! !
