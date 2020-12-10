@@ -274,7 +274,11 @@ test02
 	self assert: 100 * peso equals: destinationAccount balance.
 	! !
 
+<<<<<<< HEAD
+!TransferTest methodsFor: 'as yet unclassified' stamp: 'AH 12/10/2020 15:37:34'!
+=======
 !TransferTest methodsFor: 'as yet unclassified' stamp: 'AF 12/8/2020 16:28:21'!
+>>>>>>> 9e66a19549c3f7842335fba5e5490fbc1b59b00c
 test03
 	
 	|originAccount destinationAccount transfer|
@@ -283,8 +287,14 @@ test03
 	Deposit register: 100*peso on:originAccount .
 	transfer := Transfer from:originAccount To:destinationAccount anAmountOf:100*peso.
 	
+<<<<<<< HEAD
+	self assert: (transfer depositPart = (transfer withdrawPart counterpart)).
+	self assert: (transfer withdrawPart = (transfer depositPart counterpart)).
+	
+=======
 	self assert: (transfer deposit value = (100*peso)).
 	self assert: (transfer withdraw value = (100*peso)).
+>>>>>>> 9e66a19549c3f7842335fba5e5490fbc1b59b00c
 	
 	! !
 
@@ -445,9 +455,15 @@ accountsSize
 balance
 	
 	self accountsSize = 0 ifTrue: [^ 0*peso].
+<<<<<<< HEAD
 
 	^  accounts sum: [:anAccount | anAccount balance]! !
 
+=======
+
+	^  accounts sum: [:anAccount | anAccount balance]! !
+
+>>>>>>> 9e66a19549c3f7842335fba5e5490fbc1b59b00c
 
 !Portfolio methodsFor: 'composition - private' stamp: 'AF 12/8/2020 17:03:49'!
 addRootParentsTo: rootParents
@@ -578,11 +594,19 @@ isComposedBy: anAccount
 
 !classDefinition: #Transfer category: 'ServiciosFinancieros-Ejercicio'!
 Object subclass: #Transfer
+<<<<<<< HEAD
+	instanceVariableNames: 'withdrawPart depositPart'
+=======
 	instanceVariableNames: 'originAccount destinationAccount amountOfTransfer deposit withdraw'
+>>>>>>> 9e66a19549c3f7842335fba5e5490fbc1b59b00c
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'ServiciosFinancieros-Ejercicio'!
 
+<<<<<<< HEAD
+
+!Transfer methodsFor: 'initialization' stamp: 'AH 12/10/2020 15:41:37'!
+=======
 !Transfer methodsFor: 'accessing' stamp: 'AF 12/8/2020 16:22:27'!
 deposit
 
@@ -597,34 +621,42 @@ withdraw
 
 
 !Transfer methodsFor: 'initialization' stamp: 'AF 12/8/2020 16:30:53'!
+>>>>>>> 9e66a19549c3f7842335fba5e5490fbc1b59b00c
 initializeTransferWithOriginAccount: anOriginAccount toADestinationAccount: aDestinationAccount forAnAmountOf: anAmountOfTransfer 
-	originAccount := anOriginAccount.
-	destinationAccount := aDestinationAccount.
-	amountOfTransfer := anAmountOfTransfer.
-	
 	anOriginAccount register: self.
-	aDestinationAccount register:self.! !
+	aDestinationAccount register:self.
+	withdrawPart := TransferPart withAccount: 	anOriginAccount  withCounterpart: depositPart withAmountOfTransfer: anAmountOfTransfer.
+	depositPart := TransferPart withAccount: aDestinationAccount  withCounterpart: withdrawPart withAmountOfTransfer: anAmountOfTransfer.
+	withdrawPart withAccount: 	anOriginAccount  withCounterpart: depositPart withAmountOfTransfer: anAmountOfTransfer.
+	! !
 
 
-!Transfer methodsFor: 'testing' stamp: 'AH 12/5/2020 21:31:03'!
+!Transfer methodsFor: 'testing' stamp: 'AH 12/10/2020 15:19:17'!
 hasDestinationAccount: aPossibleDestinationAccount
 
-	^ destinationAccount isComposedBy: aPossibleDestinationAccount! !
+	^ depositPart account isComposedBy: aPossibleDestinationAccount! !
 
-!Transfer methodsFor: 'testing' stamp: 'AH 12/5/2020 21:19:47'!
+!Transfer methodsFor: 'testing' stamp: 'AH 12/10/2020 15:19:41'!
 hasOriginAccount: aPossibleOriginAccount
+	^ withdrawPart account isComposedBy: aPossibleOriginAccount! !
 
-	^ originAccount isComposedBy: aPossibleOriginAccount! !
-
-!Transfer methodsFor: 'testing' stamp: 'AH 12/5/2020 21:31:03'!
+!Transfer methodsFor: 'testing' stamp: 'AH 12/10/2020 15:21:07'!
 hasOriginAccount: aPossibleOriginAccount hasDestinationAccount: aPossibleDestinationAccount forAnAmountOf: aPossibleAmount 
 	^ (self hasOriginAccount: aPossibleOriginAccount) and:[self hasDestinationAccount: aPossibleDestinationAccount ] 
-	and:[amountOfTransfer = aPossibleAmount ].! !
+	and:[self amountOfTransfer = aPossibleAmount ].! !
 
 
-!Transfer methodsFor: 'as yet unclassified' stamp: 'AH 12/5/2020 21:24:18'!
+!Transfer methodsFor: 'as yet unclassified' stamp: 'AH 12/10/2020 15:18:18'!
 amountOfTransfer
-	^amountOfTransfer.! !
+	^withdrawPart value.! !
+
+!Transfer methodsFor: 'as yet unclassified' stamp: 'AH 12/10/2020 15:25:54'!
+depositPart
+	^depositPart ! !
+
+!Transfer methodsFor: 'as yet unclassified' stamp: 'AH 12/10/2020 15:26:03'!
+withdrawPart
+	^withdrawPart ! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -632,6 +664,50 @@ amountOfTransfer
 Transfer class
 	instanceVariableNames: ''!
 
+<<<<<<< HEAD
+!Transfer class methodsFor: 'as yet unclassified' stamp: 'AH 12/10/2020 14:44:55'!
+=======
 !Transfer class methodsFor: 'as yet unclassified' stamp: 'AF 12/8/2020 16:29:29'!
+>>>>>>> 9e66a19549c3f7842335fba5e5490fbc1b59b00c
 from: anOriginAccount To: aDestinationAccount anAmountOf: anAmountOfTransfer 
-	^self new initializeTransferWithOriginAccount: anOriginAccount toADestinationAccount:aDestinationAccount forAnAmountOf: anAmountOfTransfer.! !
+	
+	^self new initializeTransferWithOriginAccount: anOriginAccount 
+		toADestinationAccount:aDestinationAccount 
+		forAnAmountOf: anAmountOfTransfer.! !
+
+
+!classDefinition: #TransferPart category: 'ServiciosFinancieros-Ejercicio'!
+Object subclass: #TransferPart
+	instanceVariableNames: 'associatedAccount counterpart transferValue'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'ServiciosFinancieros-Ejercicio'!
+
+!TransferPart methodsFor: 'as yet unclassified' stamp: 'AH 12/10/2020 15:22:17'!
+account
+	^associatedAccount .! !
+
+!TransferPart methodsFor: 'as yet unclassified' stamp: 'AH 12/10/2020 15:37:58'!
+counterpart
+	^counterpart ! !
+
+!TransferPart methodsFor: 'as yet unclassified' stamp: 'AH 12/10/2020 15:24:29'!
+initializeTransferPartWithAccount: anAssociatedAccount  withCounterpart: aCounterpartAccount withAmountOfTransfer: anAmountOfTransfer.
+	associatedAccount := anAssociatedAccount.
+	counterpart := aCounterpartAccount .
+	transferValue := anAmountOfTransfer .
+	! !
+
+!TransferPart methodsFor: 'as yet unclassified' stamp: 'AH 12/10/2020 15:23:54'!
+tranferValue
+	^transferValue ! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'TransferPart class' category: 'ServiciosFinancieros-Ejercicio'!
+TransferPart class
+	instanceVariableNames: ''!
+
+!TransferPart class methodsFor: 'as yet unclassified' stamp: 'AH 12/10/2020 15:14:19'!
+withAccount: anAssociatedAccount  withCounterpart: aCounterpartAccount withAmountOfTransfer: anAmountOfTransfer.
+	^self new initializeTransferPartWithAccount: anAssociatedAccount  withCounterpart: aCounterpartAccount withAmountOfTransfer: anAmountOfTransfer.! !
