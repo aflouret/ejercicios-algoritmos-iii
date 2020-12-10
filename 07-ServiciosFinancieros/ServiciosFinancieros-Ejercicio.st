@@ -266,17 +266,16 @@ TestCase subclass: #TransferTest
 	poolDictionaries: ''
 	category: 'ServiciosFinancieros-Ejercicio'!
 
-!TransferTest methodsFor: 'as yet unclassified' stamp: 'AF 12/10/2020 17:20:32'!
+!TransferTest methodsFor: 'as yet unclassified' stamp: 'AF 12/10/2020 17:56:26'!
 test01EmptyTransferShouldNotModifyAccountBalance
 	
-	|originAccount destinationAccount transfer|
+	|originAccount destinationAccount |
 	originAccount := ReceptiveAccount new.
 	destinationAccount := ReceptiveAccount new.
 	
-	transfer := Transfer from:originAccount To:destinationAccount anAmountOf:0*peso.
-	self assert:(transfer hasOriginAccount:originAccount).
-	self assert: (transfer hasDestinationAccount: destinationAccount).
-	self assert: (transfer amountOfTransfer = (0*peso)).
+	Transfer from:originAccount To:destinationAccount anAmountOf:0*peso.
+	self assert: originAccount balance = (0*peso).
+	self assert: destinationAccount balance = (0*peso)
 
 	! !
 
@@ -293,7 +292,7 @@ test02TransferShouldModifyBalanceOfBothAccountsOnTransferAmount
 	self assert: 100 * peso equals: destinationAccount balance.
 	! !
 
-!TransferTest methodsFor: 'as yet unclassified' stamp: 'AF 12/10/2020 16:57:15'!
+!TransferTest methodsFor: 'as yet unclassified' stamp: 'AF 12/10/2020 17:52:50'!
 test03TransferPartsShouldKnowTheirCounterpart
 	
 	|originAccount destinationAccount transfer|
@@ -304,6 +303,20 @@ test03TransferPartsShouldKnowTheirCounterpart
 	
 	self assert: (transfer withdrawPart = transfer depositPart counterpart).
 	self assert: (transfer depositPart = transfer withdrawPart counterpart).
+
+	! !
+
+!TransferTest methodsFor: 'as yet unclassified' stamp: 'AF 12/10/2020 18:02:49'!
+test04TransferPartsValueShouldEqualTransferValue
+	
+	|originAccount destinationAccount transfer|
+	originAccount := ReceptiveAccount new.
+	destinationAccount := ReceptiveAccount new.
+	Deposit register: 100*peso on:originAccount .
+	transfer := Transfer from:originAccount To:destinationAccount anAmountOf:100*peso.
+	
+	self assert: (transfer withdrawPart value = (100*peso)).
+	self assert: (transfer depositPart value = (100*peso)).
 
 	! !
 
@@ -372,6 +385,23 @@ for: aValue
 	^ self new initializeFor: aValue ! !
 
 
+!classDefinition: #TransferDeposit category: 'ServiciosFinancieros-Ejercicio'!
+Deposit subclass: #TransferDeposit
+	instanceVariableNames: 'counterpart'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'ServiciosFinancieros-Ejercicio'!
+
+!TransferDeposit methodsFor: 'associating' stamp: 'AF 12/10/2020 17:32:35'!
+linkWithCounterpart: aTransferWithdraw 
+	counterpart := aTransferWithdraw! !
+
+
+!TransferDeposit methodsFor: 'accessing' stamp: 'AF 12/10/2020 17:33:19'!
+counterpart
+	^counterpart! !
+
+
 !classDefinition: #Withdraw category: 'ServiciosFinancieros-Ejercicio'!
 AccountTransaction subclass: #Withdraw
 	instanceVariableNames: 'value'
@@ -400,6 +430,24 @@ Withdraw class
 for: aValue
 
 	^ self new initializeFor: aValue ! !
+
+
+!classDefinition: #TransferWithdraw category: 'ServiciosFinancieros-Ejercicio'!
+Withdraw subclass: #TransferWithdraw
+	instanceVariableNames: 'counterpart'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'ServiciosFinancieros-Ejercicio'!
+
+!TransferWithdraw methodsFor: 'associating' stamp: 'AF 12/10/2020 17:33:03'!
+linkWithCounterpart: aTransferDeposit 
+	counterpart := aTransferDeposit! !
+
+
+!TransferWithdraw methodsFor: 'accessing' stamp: 'AF 12/10/2020 17:33:31'!
+counterpart
+	
+	^counterpart! !
 
 
 !classDefinition: #Portfolio category: 'ServiciosFinancieros-Ejercicio'!
@@ -549,17 +597,13 @@ initialize
 	transactions := OrderedCollection new.! !
 
 
-!ReceptiveAccount methodsFor: 'main protocol' stamp: 'AF 12/10/2020 16:38:09'!
+!ReceptiveAccount methodsFor: 'main protocol' stamp: 'AF 12/10/2020 17:44:43'!
 balance
 	|totalBalance|
 	totalBalance := 0*peso.
 	transactions do: [ :aTransaction | 
 		(aTransaction isKindOf:Deposit) ifTrue: [ totalBalance := totalBalance + aTransaction value].
 		(aTransaction isKindOf:Withdraw) ifTrue: [ totalBalance := totalBalance - aTransaction value].
-		(aTransaction isKindOf: Transfer ) ifTrue: [
-			(aTransaction hasOriginAccount: self) ifTrue:[totalBalance := totalBalance - aTransaction amountOfTransfer].
-			(aTransaction hasDestinationAccount: self) ifTrue:[totalBalance := totalBalance + aTransaction amountOfTransfer].
-			].
 		].
 	^totalBalance.! !
 
@@ -589,7 +633,7 @@ isComposedBy: anAccount
 
 !classDefinition: #Transfer category: 'ServiciosFinancieros-Ejercicio'!
 Object subclass: #Transfer
-	instanceVariableNames: 'originAccount destinationAccount amountOfTransfer depositPart withdrawPart'
+	instanceVariableNames: 'depositPart withdrawPart'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'ServiciosFinancieros-Ejercicio'!
@@ -605,37 +649,16 @@ withdrawPart
 	^ withdrawPart! !
 
 
-!Transfer methodsFor: 'initialization' stamp: 'AF 12/10/2020 17:10:31'!
+!Transfer methodsFor: 'initialization' stamp: 'AF 12/10/2020 18:06:19'!
 initializeTransferWithOriginAccount: anOriginAccount toADestinationAccount: aDestinationAccount forAnAmountOf: anAmountOfTransfer 
 	
-	originAccount := anOriginAccount.
-	destinationAccount := aDestinationAccount.
-	amountOfTransfer := anAmountOfTransfer.
-	depositPart := TransferPart new.
-	withdrawPart := TransferPart new.
+	depositPart := TransferDeposit register: anAmountOfTransfer on: aDestinationAccount.
+	withdrawPart := TransferWithdraw register: anAmountOfTransfer on: anOriginAccount.
 	
 	depositPart linkWithCounterpart: withdrawPart.
 	withdrawPart linkWithCounterpart: depositPart.
-	
-	
-	anOriginAccount register: self.
-	aDestinationAccount register:self.! !
+! !
 
-
-!Transfer methodsFor: 'testing' stamp: 'AH 12/5/2020 21:31:03'!
-hasDestinationAccount: aPossibleDestinationAccount
-
-	^ destinationAccount isComposedBy: aPossibleDestinationAccount! !
-
-!Transfer methodsFor: 'testing' stamp: 'AH 12/5/2020 21:19:47'!
-hasOriginAccount: aPossibleOriginAccount
-
-	^ originAccount isComposedBy: aPossibleOriginAccount! !
-
-
-!Transfer methodsFor: 'as yet unclassified' stamp: 'AH 12/5/2020 21:24:18'!
-amountOfTransfer
-	^amountOfTransfer.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -647,20 +670,3 @@ Transfer class
 from: anOriginAccount To: aDestinationAccount anAmountOf: anAmountOfTransfer 
 
 	^self new initializeTransferWithOriginAccount: anOriginAccount toADestinationAccount:aDestinationAccount forAnAmountOf: anAmountOfTransfer.! !
-
-
-!classDefinition: #TransferPart category: 'ServiciosFinancieros-Ejercicio'!
-Object subclass: #TransferPart
-	instanceVariableNames: 'counterpart account'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'ServiciosFinancieros-Ejercicio'!
-
-!TransferPart methodsFor: 'as yet unclassified' stamp: 'AF 12/10/2020 16:16:55'!
-counterpart
-	^ counterpart! !
-
-!TransferPart methodsFor: 'as yet unclassified' stamp: 'AF 12/10/2020 17:07:50'!
-linkWithCounterpart: aTransferPart
-
-	counterpart := aTransferPart! !
