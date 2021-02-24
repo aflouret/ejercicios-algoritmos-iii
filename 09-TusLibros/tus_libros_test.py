@@ -1,6 +1,9 @@
 import unittest
 from cart import Cart
 from cashier import Cashier
+from facade import Facade, ClockSimulator
+from datetime import datetime, date, time, timedelta
+
 
 
 
@@ -27,6 +30,12 @@ class TusLibrosTest(unittest.TestCase):
         catalog = {self.aBookFromTheEditorial(): self.priceOfABookFromTheEditorial(),
                    self.anotherBookFromTheEditorial(): self.priceOfAnotherBookFromTheEditorial()}
         return Cashier(catalog)
+
+    def createCompleteFacade(self, aClock = ClockSimulator()):
+        catalog = {self.aBookFromTheEditorial(): self.priceOfABookFromTheEditorial(),
+                   self.anotherBookFromTheEditorial(): self.priceOfAnotherBookFromTheEditorial()}
+        cashier = Cashier(catalog)
+        return Facade(catalog, cashier, aClock)
 
     def assertRaisesErrorAndCartRemainsEmpty(self, aBlockExpectedToFail, expectedErrorMessage, aCart):
         try:
@@ -156,6 +165,127 @@ class TusLibrosTest(unittest.TestCase):
         self.assertRaisesErrorAndNoSalesWereMade(lambda: aCashier.checkOutCart(newCart, "1111111111111111", "052026"),
                                                  newCart, aCashier)
 
+
+    def test14cannotCreateCartWithInvalidID(self):
+        clock = ClockSimulator()
+        facade = self.createCompleteFacade(clock)
+        try:
+            facade.createCart("Invalid ID", "Invalid Password")
+            self.fail()
+        except Exception as expectedException:
+            self.assertEqual(str(expectedException), "Invalid ID")
+
+    def test15cannotListACartThatDoesNotExist(self):
+        clock = ClockSimulator()
+        facade = self.createCompleteFacade(clock)
+        try:
+            facade.listCart("1234")
+            self.fail()
+        except Exception as expectedException:
+            self.assertEqual(str(expectedException), "There are no carts with that ID")
+
+    def test16CanListValidCart(self):
+        clock = ClockSimulator()
+        facade = self.createCompleteFacade(clock)
+        cartId = facade.createCart("Valid ID", "Valid Password")
+        listOfBooks = facade.listCart(cartId)
+        self.assertEqual(len(listOfBooks), 0)
+
+    def test17TwoDifferentCartsHaveDifferentIds(self):
+        clock = ClockSimulator()
+        facade = self.createCompleteFacade(clock)
+        cartId = facade.createCart("Valid ID", "Valid Password")
+        anotherCartId = facade.createCart("Another Valid ID", "Another Valid Password")
+        self.assertNotEqual(cartId, anotherCartId)
+
+    def test18ListingCartShowsBooksAddedToCart(self):
+        clock = ClockSimulator()
+        facade = self.createCompleteFacade(clock)
+        cartId = facade.createCart("Valid ID", "Valid Password")
+        facade.addToCart(cartId, self.aBookFromTheEditorial(), 4)
+        listOfBooks = facade.listCart(cartId)
+        self.assertEqual(listOfBooks.count(self.aBookFromTheEditorial()), 4)
+
+    def test19CannotAddBookToCartThatDoesNotExist(self):
+        clock = ClockSimulator()
+        facade = self.createCompleteFacade(clock)
+        try:
+            facade.addToCart("1234", self.aBookFromTheEditorial(), 4)
+        except Exception as expectedException:
+            self.assertEqual(str(expectedException), "There are no carts with that ID")
+
+    def test20ListingDifferentCartsShowsDifferentLists(self):
+        clock = ClockSimulator()
+        facade = self.createCompleteFacade(clock)
+        cartId = facade.createCart("Valid ID", "Valid Password")
+        anotherCartId = facade.createCart("Another Valid ID", "Another Valid Password")
+        facade.addToCart(cartId, self.aBookFromTheEditorial(), 4)
+        facade.addToCart(anotherCartId, self.anotherBookFromTheEditorial(), 2)
+        self.assertEqual(facade.listCart(cartId).count(self.aBookFromTheEditorial()), 4)
+        self.assertEqual(facade.listCart(anotherCartId).count(self.anotherBookFromTheEditorial()), 2)
+
+    def test21CanNotCheckOutCartThatDoesNotExist(self):
+        clock = ClockSimulator()
+        facade = self.createCompleteFacade(clock)
+        try:
+            facade.checkOutCart("1234", "1234567890123456", "052023", "Card Owner's Name")
+        except Exception as expectedException:
+            self.assertEqual(str(expectedException), "There are no carts with that ID")
+
+    def test22(self):
+        clock = ClockSimulator()
+        facade = self.createCompleteFacade(clock)
+        cartId = facade.createCart("Valid ID", "Valid Password")
+        facade.addToCart(cartId, self.aBookFromTheEditorial(), 4)
+        facade.checkOutCart(cartId, "1234567890123456", "052023", "Card Owner's Name")
+        self.assertEqual(len(facade.listCart(cartId)), 0)
+
+    """corregir cashier
+    registrar ventas
+    archivo clocksimulator
+    """
+
+    def test23cannotListExpiredCart(self):
+        clock = ClockSimulator()
+        facade = self.createCompleteFacade(clock)
+        cartId = facade.createCart("Valid ID", "Valid Password")
+        clock.goForward(timedelta(minutes=30, seconds=1))
+        try:
+            facade.listCart(cartId)
+            self.fail()
+        except Exception as expectedException:
+            self.assertEqual(str(expectedException), "Cart expired")
+
+
+    def test24cannotAddBookToExpiredCart(self):
+        clock = ClockSimulator()
+        facade = self.createCompleteFacade(clock)
+        cartId = facade.createCart("Valid ID", "Valid Password")
+        clock.goForward(timedelta(minutes=30, seconds=1))
+        try:
+            facade.addToCart(cartId, self.aBookFromTheEditorial(), 4)
+            self.fail()
+        except Exception as expectedException:
+            self.assertEqual(str(expectedException), "Cart expired")
+
+    def test25cannotCheckOutExpiredCart(self):
+        clock = ClockSimulator()
+        facade = self.createCompleteFacade(clock)
+        cartId = facade.createCart("Valid ID", "Valid Password")
+        clock.goForward(timedelta(minutes=30, seconds=1))
+        try:
+            facade.checkOutCart(cartId, "1234567890123456", "052023", "Card Owner's Name")
+            self.fail()
+        except Exception as expectedException:
+            self.assertEqual(str(expectedException), "Cart expired")
+
+    def test26CartIsNotExpiredAtExactlyThirtyMinutes(self):
+        clock = ClockSimulator()
+        facade = self.createCompleteFacade(clock)
+        cartId = facade.createCart("Valid ID", "Valid Password")
+        clock.goForward(timedelta(minutes=30))
+        listOfBooks = facade.listCart(cartId)
+        self.assertEqual(len(listOfBooks), 0)
 
 def main():
     unittest.main()
