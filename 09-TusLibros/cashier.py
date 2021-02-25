@@ -1,18 +1,18 @@
-from merchant_processor import MerchantProcessor
+from ticket import Ticket
 
 class Cashier:
 
-    def __init__(self, aCatalog):
+    def __init__(self, aCatalog, aMerchantProcessor):
         self.sales = []
         self.catalog = aCatalog
+        self.merchantProcessor = aMerchantProcessor
         self.totalAmount = 0
 
     def checkOutCart(self, aCart, aCreditCardNumber, aCreditCardExpirationDate):
         if aCart.isEmpty():
             raise Exception("Empty cart cannot be checked out")
 
-        merchantProcessor = MerchantProcessor()
-        transactionResult = merchantProcessor.processPayment(aCreditCardNumber, aCreditCardExpirationDate, aCart.totalAmount)
+        transactionResult = self.merchantProcessor.processPayment(aCreditCardNumber, aCreditCardExpirationDate, aCart.totalAmount)
 
         if transactionResult[0] == "1":
             raise Exception()
@@ -28,20 +28,5 @@ class Cashier:
     def numberOfCopiesSold(self, aBook):
         return self.sales.count(aBook)
 
-class Ticket:
 
-    @classmethod
-    def generate(cls, aTotalAmount, aListOfBooks):
-        listOfBooksByQuantity = {book: aListOfBooks.count(book) for book in aListOfBooks}
-        return cls(aTotalAmount, listOfBooksByQuantity)
-
-    def __init__(self, aTotalAmount, aListOfBooksByQuantity):
-        self._totalAmount = aTotalAmount
-        self._listOfBooksByQuantity = aListOfBooksByQuantity
-
-    def totalAmount(self):
-        return self._totalAmount
-
-    def listOfBooksByQuantity(self):
-        return self._listOfBooksByQuantity
 

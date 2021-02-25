@@ -1,5 +1,23 @@
 from datetime import datetime
 
+
+class AuthenticatorSimulator:
+
+    def authenticate(self, aClientId, aPassword):
+        idDatabase = {"Valid ID": "Valid Password", "Another Valid ID": "Another Valid Password"}
+        return (aClientId in idDatabase) and (idDatabase[aClientId] == aPassword)
+
+class ClockSimulator:
+
+    def __init__(self):
+        self.time = datetime.now()
+
+    def getTime(self):
+        return self.time
+
+    def goForward(self, aTimeDelta):
+        self.time += aTimeDelta
+
 class MerchantProcessor:
 
     def validateCreditCardExpiration(self, aCreditCardExpirationDate):
