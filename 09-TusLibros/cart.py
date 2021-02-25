@@ -2,7 +2,6 @@ class Cart:
 
     def __init__(self, aCatalog):
         self.books = []
-        self.totalAmount = 0
         self.catalog = aCatalog
 
     def listCart(self):
@@ -22,7 +21,6 @@ class Cart:
 
         for _ in range(aBookQuantity):
             self.books.append(aBook)
-            self.totalAmount += self.catalog[aBook]
 
     def hasBook(self, aBook):
         return aBook in self.books
@@ -33,3 +31,6 @@ class Cart:
     def emptyCart(self):
         self.books = []
         self.totalAmount = 0
+
+    def totalAmount(self):
+        return sum(self.catalog[book] for book in self.books)
